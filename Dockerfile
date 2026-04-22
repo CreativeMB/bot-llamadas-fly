@@ -8,16 +8,16 @@ RUN apk add --no-cache \
     freetype \
     harfbuzz \
     ca-certificates \
-    ttf-free-fonts
+    ttf-freefont
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-COPY package*.json./
-COPY tsconfig.json./
+COPY package*.json ./
+COPY tsconfig.json ./
 RUN npm ci
 
-COPY..
+COPY . .
 
 EXPOSE 3008
 

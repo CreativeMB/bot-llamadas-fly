@@ -1,23 +1,33 @@
-﻿app = "bot-llamadas"
-primary_region = "gru"
+app = 'bot-llamadas-creativemb'
+primary_region = 'gru'
 
 [build]
 
 [env]
-  PORT = "3008"
+  NODE_ENV = 'production'
+  PORT = '3008'
+  PUPPETEER_EXECUTABLE_PATH = '/usr/bin/chromium-browser'
 
-[mounts]
-  source = "bot_data"
-  destination = "/app/bot_sessions"
+[[mounts]]
+  source = 'bot_data'
+  destination = '/data'
 
-[[services]]
+[http_service]
   internal_port = 3008
-  protocol = "tcp"
-  
-  [[services.ports]]
-    handlers = ["http"]
-    port = 80
-    
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
+  force_https = true
+  auto_stop_machines = false # Cambiado para que el bot no se apague solo
+  auto_start_machines = true
+  min_machines_running = 1    # Cambiado a 1 para que siempre esté activo
+  processes = ['app']
+
+  [[http_service.checks]]
+    grace_period = "30s"      # Aumentado para dar tiempo a Chromium
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
