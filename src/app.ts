@@ -73,9 +73,11 @@ const main = async () => {
     // If you experience ERRO AUTH issues, check the latest WhatsApp version at:
     // https://wppconnect.io/whatsapp-versions/
     // Example: version "2.3000.1035824857-alpha" -> [2, 3000, 1035824857]
-    const adapterProvider = createProvider(Provider, 
-		{ version: [2, 3000, 1035824857] } 
-	)
+   // --- CORRECCIÓN AQUÍ ---
+const adapterProvider = createProvider(Provider, { 
+    version: [2, 3000, 1035824857], // <-- No olvides esta coma
+    savePath: '/data'              // <-- Ahora sí está bien vinculado al volumen de Fly
+})
     const adapterDB = new Database()
 
     const { handleCtx, httpServer } = await createBot({
@@ -228,7 +230,11 @@ const main = async () => {
         res.writeHead(200, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ status: 'ok', connected: !!id, number: id ? id.split(':')[0] : 'Desconectado' }))
     }))
-httpServer(+PORT)
+// Al final de tu main, reemplaza el httpServer por esto:
+const PORT_NUMBER = parseInt(process.env.PORT || '3008', 10);
+httpServer(PORT_NUMBER, '0.0.0.0');
+
+console.log(`✅ Servidor vinculado a 0.0.0.0:${PORT_NUMBER}`);
 } 
 main()
 // Esto evita que el bot se apague si hay un error inesperado

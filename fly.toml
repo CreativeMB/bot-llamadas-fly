@@ -6,8 +6,7 @@ primary_region = 'gru'
 [env]
   NODE_ENV = 'production'
   PORT = '3008'
-  PUPPETEER_EXECUTABLE_PATH = '/usr/bin/chromium-browser'
-
+ 
 [[mounts]]
   source = 'bot_data'
   destination = '/data'
@@ -21,13 +20,13 @@ primary_region = 'gru'
   processes = ['app']
 
   [[http_service.checks]]
-    grace_period = "30s"      # Aumentado para dar tiempo a Chromium
+    grace_period = "60s"      
     interval = "30s"
     method = "GET"
     timeout = "5s"
-    path = "/health"
+    path = "/v1/status"
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
