@@ -1,0 +1,13 @@
+para subir a fly cambios
+cd "D:\APK\bot-llamadas-fly"
+fly deploy --strategy immediate --ha=false
+
+https://fly.io/apps/bot-llamadas-creativemb/monitoring
+
+https://bot-llamadas-creativemb.fly.dev/v1/qr
+
+https://bot-llamadas-creativemb.fly.dev/v1/get-pairing
+
+https://bot-llamadas-creativemb.fly.dev/v1/messages
+
+https://bot-llamadas-creativemb.fly.dev/v1/status

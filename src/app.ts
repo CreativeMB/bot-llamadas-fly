@@ -45,7 +45,7 @@ const discordFlow = addKeyword('documentation_flow') // Keyword interno
         }
     )
 // 3. FLUJO DE BIENVENIDA (Versión Corregida y Estable)
-const welcomeFlow = addKeyword(['#'])
+const welcomeFlow = addKeyword(['DESACTIVADO_TEMPORAL_999888777666'])
     .addAnswer(`❤️ Di lo que quieras y cuando quieras con flores ❤️ *Floristeria los lirios*`)
     .addAnswer(
         [
