@@ -1,0 +1,7 @@
+﻿node_modules
+dist
+bot_sessions
+*.log
+bot.qr.png
+.env
+.DS_Store

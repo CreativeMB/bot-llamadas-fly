@@ -1,0 +1,23 @@
+﻿app = "bot-llamadas"
+primary_region = "gru"
+
+[build]
+
+[env]
+  PORT = "3008"
+
+[mounts]
+  source = "bot_data"
+  destination = "/app/bot_sessions"
+
+[[services]]
+  internal_port = 3008
+  protocol = "tcp"
+  
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+    
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
