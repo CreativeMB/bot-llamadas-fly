@@ -69,27 +69,31 @@ const welcomeFlow = addKeyword(['DESACTIVADO_TEMPORAL_999888777666'])
 
 const main = async () => {
    const adapterFlow = createFlow([welcomeFlow, registerFlow, discordFlow, fullSamplesFlow])
-    
-    // If you experience ERRO AUTH issues, check the latest WhatsApp version at:
-    // https://wppconnect.io/whatsapp-versions/
-    // Example: version "2.3000.1035824857-alpha" -> [2, 3000, 1035824857]
-   // --- CORRECCIÓN AQUÍ ---
+  
 const adapterProvider = createProvider(Provider, { 
-    version: [2, 3000, 1035824857], // <-- No olvides esta coma
-    savePath: '/data'              // <-- Ahora sí está bien vinculado al volumen de Fly
+    version: [2, 3000, 1035824857],
+    savePath: '/data'  
 })
-    const adapterDB = new Database()
 
-    const { handleCtx, httpServer } = await createBot({
-        flow: adapterFlow,
-        provider: adapterProvider,
-        database: adapterDB,
-    })
- // --- AGREGA ESTE "RASTREADOR" JUSTO AQUÍ ---
-    adapterProvider.server.use((req, res, next) => {
-        console.log(`[TÚNEL NGROK]: ${req.method} ${req.url}`);
-        next();
-    });
+// 1. Pon el rastreador primero para ver TODO en la consola
+adapterProvider.server.use((req, res, next) => {
+    console.log(`[PETICIÓN RECIBIDA]: ${req.method} ${req.url}`);
+    next();
+});
+
+// 2. Pon la ruta de prueba
+adapterProvider.server.get('/v1/test', (req, res) => {
+    res.send('SERVIDOR FUNCIONANDO');
+});
+
+const adapterDB = new Database()
+
+// 3. Finalmente inicias el bot
+const { handleCtx, httpServer } = await createBot({
+    flow: adapterFlow,
+    provider: adapterProvider,
+    database: adapterDB,
+})
 
   /**
      * ENVIAR MENSAJE SIMPLE O CON MEDIA
@@ -213,23 +217,14 @@ const adapterProvider = createProvider(Provider, {
         res.end(JSON.stringify({ status: 'error', message: "El motor no está listo, intenta de nuevo" }))
     }
 }))
- // 4. QR
-    adapterProvider.server.get('/v1/qr', handleCtx(async (bot, req, res) => {
-        const qrPath = join(process.cwd(), 'bot.qr.png')
-        if (existsSync(qrPath)) {
-            const file = readFileSync(qrPath)
-            res.writeHead(200, { 'Content-Type': 'image/png' })
-            return res.end(file)
-        }
-        res.writeHead(404)
-        res.end('No QR')
-    }))
+
     // 1. STATUS
     adapterProvider.server.get('/v1/status', handleCtx(async (bot, req, res) => {
         const id = bot?.provider?.vendor?.user?.id
         res.writeHead(200, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ status: 'ok', connected: !!id, number: id ? id.split(':')[0] : 'Desconectado' }))
     }))
+    
 // Al final de tu main, reemplaza el httpServer por esto:
 const PORT_NUMBER = parseInt(process.env.PORT || '3008', 10);
 httpServer(PORT_NUMBER, '0.0.0.0');

@@ -2,23 +2,20 @@
 
 WORKDIR /app
 
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont
+# Instalamos dependencias necesarias para compilar paquetes nativos en Linux
+RUN apk add --no-cache tzdata
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV NODE_ENV=production
 
+# Copiamos solo los archivos de dependencias PRIMERO
 COPY package*.json ./
-COPY tsconfig.json ./
-RUN npm ci
+
+# Esto instalará el esbuild de Linux correctamente
+RUN npm install
 
 COPY . .
 
 EXPOSE 3008
 
+# Usamos npx tsx que es más directo
 CMD ["npx", "tsx", "src/app.ts"]
