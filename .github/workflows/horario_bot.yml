@@ -1,9 +1,24 @@
 name: Control Horario Bot
 on:
   schedule:
-    - cron: '0 10 * * *'  # 5:00 AM Colombia (Se despierta)
-    - cron: '0 3 * * *'   # 10:00 PM Colombia (Se apaga)
-  workflow_dispatch:      # Para que puedas prenderlo manualmente si quieres
+    # 🟢 RUTINA DE ENCENDIDO (Alrededor de 5:00 AM Colombia)
+    - cron: '58 9 * * *'   # Intento 1: 4:58 AM (Minuto "raro" para evitar la fila de GitHub)
+    - cron: '10 10 * * *'  # Intento 2: 5:10 AM (Respaldo por si falló el primero)
+
+    # 🔴 RUTINA DE APAGADO (Alrededor de 10:00 PM Colombia)
+    - cron: '2 3 * * *'    # Intento 1: 10:02 PM (Minuto "raro" sin fila de espera)
+    - cron: '15 3 * * *'   # Intento 2: 10:15 PM (Respaldo por si falló el primero)
+    
+  workflow_dispatch:      # Botón Manual
+    inputs:
+      accion_manual:
+        description: '¿Qué deseas hacer con el bot?'
+        required: true
+        default: 'encender'
+        type: choice
+        options:
+          - encender
+          - apagar
 
 jobs:
   gestion_maquinas:
@@ -16,15 +31,37 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          # Calculamos la hora de Colombia restando 5 horas al sistema
-          HORA=$(date -u -d "-5 hours" +%H)
-          echo "La hora en Colombia es las $HORA:00"
+          ACCION=""
+          CRON_USADO="${{ github.event.schedule }}"
 
-          # Si la hora es igual o mayor a las 5 AM Y menor a las 10 PM (22:00)
-          if [ "$HORA" -ge "05" ] && [ "$HORA" -lt "22" ]; then
-            echo "Horario laboral detectado. Encendiendo bot..."
-            flyctl scale count 1 --app bot-llamadas-creativemb --yes
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            
+            # Si se activó con las alarmas de la mañana
+            if [ "$CRON_USADO" = "58 9 * * *" ] || [ "$CRON_USADO" = "10 10 * * *" ]; then
+              ACCION="encender"
+              echo "⏰ Horario de mañana detectado. Acción: ENCENDER."
+            
+            # Si se activó con las alarmas de la noche
+            elif [ "$CRON_USADO" = "2 3 * * *" ] || [ "$CRON_USADO" = "15 3 * * *" ]; then
+              ACCION="apagar"
+              echo "💤 Horario de noche detectado. Acción: APAGAR."
+            fi
+
           else
-            echo "Horario de descanso detectado. Apagando bot..."
+            # Si alguien presionó el botón manual en GitHub
+            ACCION="${{ github.event.inputs.accion_manual }}"
+            echo "👤 Botón manual usado. Acción: $ACCION"
+          fi
+
+          # Ejecutar en Fly.io según la acción
+          if [ "$ACCION" = "encender" ]; then
+            echo "🚀 Encendiendo el bot..."
+            flyctl scale count 1 --app bot-llamadas-creativemb --yes
+            
+          elif [ "$ACCION" = "apagar" ]; then
+            echo "🛑 Apagando el bot..."
             flyctl scale count 0 --app bot-llamadas-creativemb --yes
+            
+          else
+            echo "⚠️ Hubo un error reconociendo la alarma."
           fi
