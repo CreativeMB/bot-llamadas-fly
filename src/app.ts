@@ -72,7 +72,7 @@ const main = async () => {
   
 const adapterProvider = createProvider(Provider, { 
     version: [2, 3000, 1035824857],
-    savePath: '/data'  
+    savePath: '/data/session' 
 })
 
 // 1. Pon el rastreador primero para ver TODO en la consola

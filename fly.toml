@@ -8,8 +8,8 @@ primary_region = 'gru'
   PORT = '3008'
  
 [[mounts]]
-  source = 'bot_data'
-  destination = '/data'
+  source = "data_vol"
+ destination = "/app/bot_sessions"
 
 [http_service]
   internal_port = 3008

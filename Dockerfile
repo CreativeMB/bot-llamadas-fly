@@ -12,7 +12,8 @@ COPY package*.json ./
 
 # Esto instalará el esbuild de Linux correctamente
 RUN npm install
-
+# Creamos la carpeta de sesión y aseguramos permisos
+RUN mkdir -p /data/session && chmod -R 777 /data
 COPY . .
 
 EXPOSE 3008

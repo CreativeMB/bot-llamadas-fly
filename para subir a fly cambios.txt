@@ -1,3 +1,5 @@
+fly auth login
+
 para subir a fly cambios
 cd "D:\APK\bot-llamadas-fly"
 fly deploy --strategy immediate --ha=false
