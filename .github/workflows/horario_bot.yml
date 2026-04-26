@@ -1,0 +1,26 @@
+name: Control Horario Bot
+on:
+  schedule:
+    - cron: '0 11 * * *'  # 6:00 AM Colombia (Se despierta)
+    - cron: '0 3 * * *'   # 10:00 PM Colombia (Se apaga)
+  workflow_dispatch:      # Esto permite probarlo manualmente desde GitHub
+
+jobs:
+  gestion_maquinas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configurar Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        
+      - name: Ejecutar Cambio de Escala
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          HORA=$(date +%H)
+          if [ "$HORA" == "11" ]; then
+            echo "Iniciando el bot..."
+            flyctl scale count 1 --app bot-llamadas-creativemb --yes
+          else
+            echo "Apagando el bot..."
+            flyctl scale count 0 --app bot-llamadas-creativemb --yes
+          fi
