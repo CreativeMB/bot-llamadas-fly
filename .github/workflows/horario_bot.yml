@@ -53,7 +53,7 @@ jobs:
             echo "👤 Botón manual usado. Acción: $ACCION"
           fi
 
-     # Ejecutar en Fly.io según la acción
+          # Ejecutar en Fly.io según la acción
           if [ "$ACCION" = "encender" ]; then
             echo "🚀 Encendiendo el bot sin borrar datos..."
             flyctl machine start $(flyctl machine list -a bot-llamadas-creativemb -q)
