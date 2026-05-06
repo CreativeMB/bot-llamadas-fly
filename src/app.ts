@@ -68,7 +68,7 @@ const welcomeFlow = addKeyword(['DESACTIVADO_TEMPORAL_999888777666'])
     )
 
 const main = async () => {
-   const adapterFlow = createFlow([welcomeFlow, registerFlow, discordFlow, fullSamplesFlow])
+   const adapterFlow = createFlow([])
   
 const adapterProvider = createProvider(Provider, { 
     version: [2, 3000, 1035824857],
